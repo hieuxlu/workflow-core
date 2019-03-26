@@ -19,36 +19,38 @@ namespace WebApiSample.Controllers
         private readonly IWorkflowController _workflowService;
         private readonly IWorkflowRegistry _registry;
         private readonly IPersistenceProvider _workflowStore;
-        private readonly ISearchIndex _searchService;
+        //private readonly ISearchIndex _searchService;
 
-        public WorkflowsController(IWorkflowController workflowService, ISearchIndex searchService, IWorkflowRegistry registry, IPersistenceProvider workflowStore)
+        public WorkflowsController(IWorkflowController workflowService, /*ISearchIndex searchService,*/ IWorkflowRegistry registry, IPersistenceProvider workflowStore)
         {
             _workflowService = workflowService;
             _workflowStore = workflowStore;
             _registry = registry;
-            _searchService = searchService;
+            //_searchService = searchService;
         }
-        
+
         [HttpGet]
-        public async Task<IActionResult> Get(string terms, WorkflowStatus? status, string type, DateTime? createdFrom, DateTime? createdTo, int skip, int take = 10)
+        public async Task<IEnumerable<WorkflowInstance>> Get(string terms, WorkflowStatus? status, string type, DateTime? createdFrom, DateTime? createdTo, int skip, int take = 10)
         {
-            var filters = new List<SearchFilter>();
+            //     var filters = new List<SearchFilter>();
 
-            if (status.HasValue)
-                filters.Add(StatusFilter.Equals(status.Value));
+            //     if (status.HasValue)
+            //         filters.Add(StatusFilter.Equals(status.Value));
 
-            if (createdFrom.HasValue)
-                filters.Add(DateRangeFilter.After(x => x.CreateTime, createdFrom.Value));
+            //     if (createdFrom.HasValue)
+            //         filters.Add(DateRangeFilter.After(x => x.CreateTime, createdFrom.Value));
 
-            if (createdTo.HasValue)
-                filters.Add(DateRangeFilter.Before(x => x.CreateTime, createdTo.Value));
+            //     if (createdTo.HasValue)
+            //         filters.Add(DateRangeFilter.Before(x => x.CreateTime, createdTo.Value));
 
-            if (!string.IsNullOrEmpty(type))
-                filters.Add(ScalarFilter.Equals(x => x.WorkflowDefinitionId, type));
+            //     if (!string.IsNullOrEmpty(type))
+            //         filters.Add(ScalarFilter.Equals(x => x.WorkflowDefinitionId, type));
 
-            var result = await _searchService.Search(terms, skip, take, filters.ToArray());
+            //     var result = await _searchService.Search(terms, skip, take, filters.ToArray());
 
-            return Json(result);
+            //     return Json(result);
+
+            return await _workflowStore.GetWorkflowInstances(status, type, createdFrom, createdTo, skip, take);
         }
 
         [HttpGet("{id}")]
